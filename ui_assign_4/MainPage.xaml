@@ -8,6 +8,36 @@
     mc:Ignorable="d">
 
     <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
-
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="leftColumn" Width="2*"/>
+            <ColumnDefinition x:Name="rightColumn" Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Border BorderThickness="1" BorderBrush="Black" Margin="100">
+            <Grid x:Name="mainGrid" SizeChanged="mainGrid_SizeChanged_1">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+            </Grid>
+        </Border>
+        <local:NumPad x:Name="numPad" Grid.Column="1" MaxHeight="600" MaxWidth="450" VerticalAlignment="Bottom" Margin="50, 50, 100, 100" />
     </Grid>
 </Page>

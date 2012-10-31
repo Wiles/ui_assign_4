@@ -1,0 +1,19 @@
+﻿<UserControl
+    x:Class="ui_assign_4.NumberBox"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ui_assign_4"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="200"
+    d:DesignWidth="200">
+
+    <Grid Tapped="Grid_Tapped">
+        <Border BorderThickness="1" BorderBrush="DarkGray" />
+        <Rectangle Fill="Transparent"></Rectangle>
+        <Viewbox VerticalAlignment="Stretch" Height="Auto">
+            <TextBlock x:Name="num" Text="0" Opacity="0" Foreground="Black" TextAlignment="Center" VerticalAlignment="Center" />
+        </Viewbox>
+    </Grid>
+</UserControl>
