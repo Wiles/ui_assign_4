@@ -41,15 +41,18 @@ namespace ui_assign_4
                 {
                     if (!n.Locked)
                     {
-                        if (Selected != null && Selected.Number == 0)
+                        if (Selected != n)
                         {
-                            Selected.Number = 0;
-                        }
+                            if (Selected != null && Selected.Number == 0)
+                            {
+                                Selected.Number = 0;
+                            }
 
-                        Selected = n;
-                        foreach(var b in GridValues)
-                        {
-                            b.TextColor = b == n ? Highlight : b.Locked ? Locked : Normal;
+                            Selected = n;
+                            foreach (var b in GridValues)
+                            {
+                                b.TextColor = b == n ? Highlight : b.Locked ? Locked : Normal;
+                            }
                         }
                     }
                 };
@@ -67,8 +70,27 @@ namespace ui_assign_4
                 }
             };
 
-            LoadGame("005314000400580100170090048030970060600000009040036010360040085004058003000263400");
+            TickTimer = new DispatcherTimer();
+            TickTimer.Interval = new TimeSpan(0, 0, 1);
+            ElapsedTime = new TimeSpan();
+            TickTimer.Tick += (s, e) =>
+            {
+                ElapsedTime = ElapsedTime.Add(new TimeSpan(0, 0, 1));
+                InvokeOnUI(() =>
+                {
+                    tbTime.Text = string.Format("{0}:{1:00}", ElapsedTime.Minutes, ElapsedTime.Seconds);
+                });
+            };
         }
+
+        private static List<string> Games = new List<string>()
+        {
+            "005314000400580100170090048030970060600000009040036010360040085004058003000263400",
+            "900040016070120805003500700090001400840309072002800030008007500401032080730080001",
+            "510006030007580200800004010001079050370205081050310600030100009002057100040600025"
+        };
+
+        private int CurrentGame { get; set; }
 
         private DispatcherTimer TickTimer { get; set; }
         private TimeSpan ElapsedTime { get; set; }
@@ -102,18 +124,9 @@ namespace ui_assign_4
                 GridValues[i].TextColor = n > 0 ? Locked : Normal;
             }
 
-            TickTimer = new DispatcherTimer();
-            TickTimer.Interval = new TimeSpan(0, 0, 1);
+            TickTimer.Stop();
             ElapsedTime = new TimeSpan();
-            TickTimer.Tick += (s, e) =>
-            {
-                ElapsedTime = ElapsedTime.Add(new TimeSpan(0, 0, 1));
-                InvokeOnUI(() =>
-                    {
-                        tbTime.Text = string.Format("{0}:{1:00}", ElapsedTime.Minutes, ElapsedTime.Seconds);
-                    });
-            };
-
+            tbTime.Text = "0:00";
             TickTimer.Start();
         }
 
@@ -142,6 +155,19 @@ namespace ui_assign_4
         private void InvokeOnUI(Action action)
         {
             this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(action));
+        }
+
+        private void Button_New(object sender, RoutedEventArgs e)
+        {
+            CurrentGame = (CurrentGame + 1) % Games.Count;
+            LoadGame(Games[CurrentGame]);
+            this.TopAppBar.IsOpen = false;
+        }
+
+        private void Button_Restart(object sender, RoutedEventArgs e)
+        {
+            LoadGame(Games[CurrentGame]);
+            this.TopAppBar.IsOpen = false;
         }
     }
 }

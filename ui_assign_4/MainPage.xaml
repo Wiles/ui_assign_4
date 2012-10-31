@@ -9,17 +9,20 @@
 
     <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="80"/>
             <RowDefinition Height="10*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition x:Name="leftColumn" Width="16*"/>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition x:Name="leftColumn" Width="8*"/>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition x:Name="rightColumn" Width="3*" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition x:Name="rightColumn" Width="6*" />
+            <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
+        <Viewbox Grid.ColumnSpan="5">
+            <TextBlock Text="Super Sudoku" />
+        </Viewbox>
         <Border BorderThickness="3" Grid.Row="1" Grid.Column="1" BorderBrush="Black">
             <Grid x:Name="mainGrid" SizeChanged="mainGrid_SizeChanged_1">
                 <Grid.RowDefinitions>
@@ -69,4 +72,21 @@
             </Viewbox>
         </Grid>
     </Grid>
+    
+    <Page.TopAppBar>
+        <AppBar>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="1"/>
+                </Grid.RowDefinitions>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="New Game" Click="Button_New" Width="120" Height="60" Margin="5" />
+                    <Button Content="Restart Game" Click="Button_Restart" Width="120" Height="60" Margin="5" />
+                    <Button Content="High Scores" Width="120" Height="60" Margin="5" />
+                </StackPanel>
+                <Rectangle Grid.Row="1" Fill="Black" />
+            </Grid>
+        </AppBar>
+    </Page.TopAppBar>
 </Page>
