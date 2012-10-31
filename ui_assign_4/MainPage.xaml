@@ -8,36 +8,65 @@
     mc:Ignorable="d">
 
     <Grid Background="{StaticResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition x:Name="leftColumn" Width="2*"/>
-            <ColumnDefinition x:Name="rightColumn" Width="1*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition x:Name="leftColumn" Width="8*"/>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition x:Name="rightColumn" Width="3*" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Border BorderThickness="1" BorderBrush="Black" Margin="100">
+        <Border BorderThickness="3" Grid.Row="1" Grid.Column="1" BorderBrush="Black">
             <Grid x:Name="mainGrid" SizeChanged="mainGrid_SizeChanged_1">
                 <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="2"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="2"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
+                <Rectangle Grid.ColumnSpan="11" Grid.Row="3" Fill="Black" />
+                <Rectangle Grid.ColumnSpan="11" Grid.Row="7" Fill="Black" />
+                <Rectangle Grid.RowSpan="11" Grid.Column="3" Fill="Black" />
+                <Rectangle Grid.RowSpan="11" Grid.Column="7" Fill="Black" />
             </Grid>
         </Border>
-        <local:NumPad x:Name="numPad" Grid.Column="1" MaxHeight="600" MaxWidth="450" VerticalAlignment="Bottom" Margin="50, 50, 100, 100" />
+        <local:NumPad x:Name="numPad" Grid.Column="3" Grid.Row="1" MaxHeight="600" MaxWidth="450" VerticalAlignment="Bottom" />
+        <Grid Grid.Column="1" Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="15" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Viewbox Grid.Column="0" HorizontalAlignment="Right">
+                <TextBlock Text="Time:" />
+            </Viewbox>
+            <Viewbox Grid.Column="2" HorizontalAlignment="Left">
+                <TextBlock x:Name="tbTime" Text="0:00" />
+            </Viewbox>
+        </Grid>
     </Grid>
 </Page>

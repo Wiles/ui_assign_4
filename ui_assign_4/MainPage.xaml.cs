@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -11,7 +12,6 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using Windows.UI;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -32,8 +32,10 @@ namespace ui_assign_4
                 var a = new NumberBox();
 
                 mainGrid.Children.Add(a);
-                Grid.SetRow(a, (int)i / 9);
-                Grid.SetColumn(a, i % 9);
+                var row = (int)i / 9;
+                var column = i % 9;
+                Grid.SetRow(a, row + (int)row / 3);
+                Grid.SetColumn(a, column + (int)column / 3);
                 a.TextColor = Normal;
                 a.Selected += (n, e) =>
                 {
@@ -68,10 +70,13 @@ namespace ui_assign_4
             LoadGame("005314000400580100170090048030970060600000009040036010360040085004058003000263400");
         }
 
+        private DispatcherTimer TickTimer { get; set; }
+        private TimeSpan ElapsedTime { get; set; }
+
         private static Color Locked = Colors.Black;
         private static Color Conflict = Colors.Red;
         private static Color Highlight = Colors.Blue;
-        private static Color Normal = Colors.DarkGray;
+        private static Color Normal = Colors.Green;
 
         private void ResetColors()
         {
@@ -96,6 +101,20 @@ namespace ui_assign_4
                 GridValues[i].Locked = n > 0;
                 GridValues[i].TextColor = n > 0 ? Locked : Normal;
             }
+
+            TickTimer = new DispatcherTimer();
+            TickTimer.Interval = new TimeSpan(0, 0, 1);
+            ElapsedTime = new TimeSpan();
+            TickTimer.Tick += (s, e) =>
+            {
+                ElapsedTime = ElapsedTime.Add(new TimeSpan(0, 0, 1));
+                InvokeOnUI(() =>
+                    {
+                        tbTime.Text = string.Format("{0}:{1:00}", ElapsedTime.Minutes, ElapsedTime.Seconds);
+                    });
+            };
+
+            TickTimer.Start();
         }
 
         /// <summary>
@@ -118,6 +137,11 @@ namespace ui_assign_4
             {
                 grid.Width = grid.Height;
             }
+        }
+
+        private void InvokeOnUI(Action action)
+        {
+            this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(action));
         }
     }
 }

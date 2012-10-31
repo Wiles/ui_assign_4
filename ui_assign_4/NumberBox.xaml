@@ -10,7 +10,7 @@
     d:DesignWidth="200">
 
     <Grid Tapped="Grid_Tapped">
-        <Border BorderThickness="1" BorderBrush="DarkGray" />
+        <Border BorderThickness="1" BorderBrush="Black" />
         <Rectangle Fill="Transparent"></Rectangle>
         <Viewbox VerticalAlignment="Stretch" Height="Auto">
             <TextBlock x:Name="num" Text="0" Opacity="0" Foreground="Black" TextAlignment="Center" VerticalAlignment="Center" />
