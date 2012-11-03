@@ -83,9 +83,20 @@
                     <RowDefinition Height="1"/>
                 </Grid.RowDefinitions>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="New Game" Click="Button_New" Width="120" Height="60" Margin="5" />
-                    <Button Content="Restart Game" Click="Button_Restart" Width="120" Height="60" Margin="5" />
-                    <Button Content="High Scores" Width="120" Height="60" Margin="5" />
+                    <Button Content="New Game" Click="Button_New" Width="150" Height="60" Margin="5" />
+                    <Button Content="Restart Game" Click="Button_Restart" Width="150" Height="60" Margin="5" />
+                    <Button Width="150" Height="60" Margin="5" Click="Button_Click_1">
+                        <Button.Content>
+                            <Grid HorizontalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="√" Width="20" x:Name="hintsCheckbox" />
+                                <TextBlock Text="Show Conflicts" Grid.Column="1" />
+                            </Grid>
+                        </Button.Content>
+                    </Button>
                 </StackPanel>
                 <Rectangle Grid.Row="1" Fill="Black" />
             </Grid>

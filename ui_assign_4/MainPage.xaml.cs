@@ -27,6 +27,7 @@ namespace ui_assign_4
         {
             this.InitializeComponent();
             GridValues = new NumberBox[81];
+            ShowConflicts = true;
 
             for (int i = 0; i < 81; i++)
             {
@@ -50,7 +51,7 @@ namespace ui_assign_4
                         Selected = n;
                         foreach (var b in GridValues)
                         {
-                            if (b != n && b.HasConflict)
+                            if (b != n && b.HasConflict && ShowConflicts)
                             {
                                 b.TextColor = Conflict;
                             }
@@ -102,13 +103,15 @@ namespace ui_assign_4
             "005314000400580100170090048030970060600000009040036010360040085004058003000263400",
             "900040016070120805003500700090001400840309072002800030008007500401032080730080001",
             "510006030007580200800004010001079050370205081050310600030100009002057100040600025",
-            "925748306674023895083596724397260458846359072502874639268907543450632987739485260"
+            "925748316674123895183596724397261458846359172512874639268917543451632987739485260"
         };
 
         private int CurrentGame { get; set; }
 
         private DispatcherTimer TickTimer { get; set; }
         private TimeSpan ElapsedTime { get; set; }
+
+        private bool ShowConflicts { get; set; }
 
         private static Color Locked = Colors.Black;
         private static Color Conflict = Colors.Red;
@@ -133,7 +136,7 @@ namespace ui_assign_4
         {
             foreach (var b in GridValues)
             {
-                if (b.HasConflict)
+                if (b.HasConflict && ShowConflicts)
                 {
                     b.TextColor = Conflict;
                 }
@@ -285,6 +288,32 @@ namespace ui_assign_4
         {
             LoadGame(Games[CurrentGame]);
             this.TopAppBar.IsOpen = false;
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            if (ShowConflicts)
+            {
+                hintsCheckbox.Text = "";
+            }
+            else
+            {
+                hintsCheckbox.Text = "√";
+            }
+
+            ShowConflicts = !ShowConflicts;
+
+            foreach (var b in GridValues)
+            {
+                if (b.HasConflict && ShowConflicts)
+                {
+                    b.TextColor = Conflict;
+                }
+                else
+                {
+                    b.TextColor = b.Locked ? Locked : Normal;
+                }
+            }
         }
     }
 }
