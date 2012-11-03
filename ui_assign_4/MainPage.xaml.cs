@@ -5,6 +5,7 @@ using System.Linq;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -39,17 +40,21 @@ namespace ui_assign_4
                 a.TextColor = Normal;
                 a.Selected += (n, e) =>
                 {
-                    if (!n.Locked)
+                    if (!n.Locked && Selected != n)
                     {
-                        if (Selected != n)
+                        if (Selected != null && Selected.Number == 0)
                         {
-                            if (Selected != null && Selected.Number == 0)
-                            {
-                                Selected.Number = 0;
-                            }
+                            Selected.Number = 0;
+                        }
 
-                            Selected = n;
-                            foreach (var b in GridValues)
+                        Selected = n;
+                        foreach (var b in GridValues)
+                        {
+                            if (b != n && b.HasConflict)
+                            {
+                                b.TextColor = Conflict;
+                            }
+                            else
                             {
                                 b.TextColor = b == n ? Highlight : b.Locked ? Locked : Normal;
                             }
@@ -65,8 +70,17 @@ namespace ui_assign_4
                 if (Selected != null)
                 {
                     Selected.Number = e.Number;
-                    Selected = null;
+                    var conflicts = DetectConflicts();
+                    if (!conflicts)
+                    {
+                        if (!GridValues.Any(g => g.Number == 0))
+                        {
+                            Win();
+                        }
+                    }
+
                     ResetColors();
+                    Selected = null;
                 }
             };
 
@@ -87,7 +101,8 @@ namespace ui_assign_4
         {
             "005314000400580100170090048030970060600000009040036010360040085004058003000263400",
             "900040016070120805003500700090001400840309072002800030008007500401032080730080001",
-            "510006030007580200800004010001079050370205081050310600030100009002057100040600025"
+            "510006030007580200800004010001079050370205081050310600030100009002057100040600025",
+            "925748306674023895083596724397260458846359072502874639268907543450632987739485260"
         };
 
         private int CurrentGame { get; set; }
@@ -100,14 +115,115 @@ namespace ui_assign_4
         private static Color Highlight = Colors.Blue;
         private static Color Normal = Colors.Green;
 
+        public void Win()
+        {
+            TickTimer.Stop();
+            for (int i = 0; i < 81; i++)
+            {
+                GridValues[i].Locked = true;
+            }
+
+            var dialog = new MessageDialog("Victory!");
+            dialog.ShowAsync();
+
+            // todo: save to high score
+        }
+
         private void ResetColors()
         {
-            // TODO: detect conflicts...
-
             foreach (var b in GridValues)
             {
-                b.TextColor = b.Locked ? Locked: Normal;
+                if (b.HasConflict)
+                {
+                    b.TextColor = Conflict;
+                }
+                else
+                {
+                    b.TextColor = b.Locked ? Locked : Normal;
+                }
             }
+        }
+
+        private bool DetectConflicts()
+        {
+            var conflicts = false;
+            for (int i = 0; i < 81; i++)
+            {
+                GridValues[i].ClearConflicts();
+            }
+
+            // check vertical columns
+            for (int column = 0; column < 9; column++)
+            {
+                var list = new List<NumberBox>();
+                for (int row = 0; row < 9; row++)
+                {
+                    var box = GridValues[((row * 9) + column)];
+
+                    if (box.Number != 0) list.Add(box);
+                }
+
+                conflicts |= MarkConflicts(list);
+            }
+
+            // check horizontal rows
+            for (int row = 0; row < 9; row++)
+            {
+                var list = new List<NumberBox>();
+                for (int column = 0; column < 9; column++)
+                {
+                    var box = GridValues[((row * 9) + column)];
+
+                    if (box.Number != 0) list.Add(box);
+                }
+
+                conflicts |= MarkConflicts(list);
+            }
+
+            for (int x = 0; x < 3; x++)
+            {
+                for (int y = 0; y < 3; y++)
+                {
+                    var topleft = y * 3 * 9 + x * 3;
+                    var list = new[]
+                    {
+                        GridValues[topleft + 0 + 0],
+                        GridValues[topleft + 1 + 0],
+                        GridValues[topleft + 2 + 0],
+                        GridValues[topleft + 0 + 9],
+                        GridValues[topleft + 1 + 9],
+                        GridValues[topleft + 2 + 9],
+                        GridValues[topleft + 0 + 18],
+                        GridValues[topleft + 1 + 18],
+                        GridValues[topleft + 2 + 18],
+                    };
+
+                    conflicts |= MarkConflicts(list.Where(b => b.Number > 0));
+                }
+            }
+
+            return conflicts;
+        }
+
+        private bool MarkConflicts(IEnumerable<NumberBox> list)
+        {
+            var conflicts = false;
+            var c = from i in list
+                    group i by i.Number into g
+                    let count = g.Count()
+                    where count > 1
+                    select g.Key;
+
+            foreach (var value in c)
+            {
+                foreach (var box in list.Where(b => b.Number == value))
+                {
+                    box.AddConflict();
+                    conflicts = true;
+                }
+            }
+
+            return conflicts;
         }
 
         private NumberBox[] GridValues { get; set; }
@@ -122,6 +238,7 @@ namespace ui_assign_4
                 GridValues[i].Number = n;
                 GridValues[i].Locked = n > 0;
                 GridValues[i].TextColor = n > 0 ? Locked : Normal;
+                GridValues[i].ClearConflicts();
             }
 
             TickTimer.Stop();

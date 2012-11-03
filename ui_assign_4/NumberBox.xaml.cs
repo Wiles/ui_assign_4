@@ -67,7 +67,28 @@ namespace ui_assign_4
             }
         }
 
+        private int conflicts;
+        public bool HasConflict
+        {
+            get
+            {
+                return conflicts > 0;
+            }
+        }
+
+        public void AddConflict()
+        {
+            conflicts++;
+        }
+
+        public void ClearConflicts()
+        {
+            conflicts = 0;
+        }
+
         public bool Locked { get; set; }
+
+        public bool Duplicate { get; set; }
 
         public event NumberBoxClicked Selected;
 
