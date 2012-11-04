@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Windows.ApplicationModel;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
@@ -28,6 +31,7 @@ namespace ui_assign_4
             this.InitializeComponent();
             GridValues = new NumberBox[81];
             ShowConflicts = true;
+            HighScores = new List<ScoreRecord>();
 
             for (int i = 0; i < 81; i++)
             {
@@ -96,6 +100,8 @@ namespace ui_assign_4
                     tbTime.Text = string.Format("{0}:{1:00}", ElapsedTime.Minutes, ElapsedTime.Seconds);
                 });
             };
+
+            LoadHighScores();
         }
 
         private static List<string> Games = new List<string>()
@@ -103,7 +109,7 @@ namespace ui_assign_4
             "005314000400580100170090048030970060600000009040036010360040085004058003000263400",
             "900040016070120805003500700090001400840309072002800030008007500401032080730080001",
             "510006030007580200800004010001079050370205081050310600030100009002057100040600025",
-            "925748316674123895183596724397261458846359172512874639268917543451632987739485260"
+            "925748316674123895183596724397261458846359172512874639268917543451632987739485260",
         };
 
         private int CurrentGame { get; set; }
@@ -112,6 +118,8 @@ namespace ui_assign_4
         private TimeSpan ElapsedTime { get; set; }
 
         private bool ShowConflicts { get; set; }
+
+        private List<ScoreRecord> HighScores { get; set; }
 
         private static Color Locked = Colors.Black;
         private static Color Conflict = Colors.Red;
@@ -126,10 +134,81 @@ namespace ui_assign_4
                 GridValues[i].Locked = true;
             }
 
-            var dialog = new MessageDialog("Victory!");
-            dialog.ShowAsync();
+            var dialog = new WinPanel();
+            var popup = new Popup();
+            dialog.Time = tbTime.Text;
+            dialog.CloseRequested += (s, e) =>
+                {
+                    popup.IsOpen = false;
+                    var panel = s as WinPanel;
+                    var name = panel.DisplayName;
 
-            // todo: save to high score
+                    if (string.IsNullOrWhiteSpace(name))
+                        name = "Anon";
+
+                    // todo: save to high score
+                    HighScores.Add(new ScoreRecord()
+                    {
+                        Name = name,
+                        Time = tbTime.Text
+                    });
+
+                    HighScores = HighScores.OrderBy(v => TimeSpan.Parse(v.Time)).Take(5).ToList();
+                    this.InvokeOnUI(() => listHighScores.ItemsSource = HighScores.OrderBy(v => TimeSpan.Parse(v.Time)));
+                    SaveHighScores();
+                };
+            popup.Child = dialog;
+            popup.IsOpen = true;
+        }
+
+        async private void LoadHighScores()
+        {
+            var path = Package.Current.InstalledLocation.Path;
+            var file = await StorageFile.GetFileFromPathAsync( path + "\\scores.txt");
+            if (file != null)
+            {
+                using (var stream = await file.OpenSequentialReadAsync())
+                using (var reader = new StreamReader(stream.AsStreamForRead()))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(line))
+                        {
+                            var split = line.Split(",".ToCharArray());
+                            var record = new ScoreRecord();
+                            record.Name = split[0];
+                            record.Time = split[1];
+                            HighScores.Add(record);
+                        }
+                    }
+                }
+            }
+
+            listHighScores.ItemsSource = HighScores.OrderBy(s => TimeSpan.Parse(s.Time));
+        }
+
+        async private void SaveHighScores()
+        {
+            try
+            {
+                var path = Package.Current.InstalledLocation.Path;
+                var file = await StorageFile.GetFileFromPathAsync(path + "\\scores.txt");
+                using (var stream = await file.OpenStreamForWriteAsync())
+                using (var writer = new StreamWriter(stream.AsOutputStream().AsStreamForWrite()))
+                {
+                    foreach (var rec in HighScores)
+                    {
+                        writer.WriteLine("{0}, {1}", rec.Name.Replace(",", ""), rec.Time);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Windows 8 has managed to implement a more complicated and obfuscated API
+                // which returns even more complicated and obfuscated exceptions.
+                // Microsoft; because understanding where you went wrong isn't important.
+            }
         }
 
         private void ResetColors()
