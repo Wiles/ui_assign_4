@@ -163,24 +163,45 @@ namespace ui_assign_4
 
         async private void LoadHighScores()
         {
-            var path = Package.Current.InstalledLocation.Path;
-            var file = await StorageFile.GetFileFromPathAsync( path + "\\scores.txt");
-            if (file != null)
+            var folder = ApplicationData.Current.LocalFolder;
+            StorageFile file = null;
+            try
             {
-                using (var stream = await file.OpenSequentialReadAsync())
-                using (var reader = new StreamReader(stream.AsStreamForRead()))
+                file = await folder.GetFileAsync("scores.txt");
+            }
+            catch
+            {
+                // you aren't allowed to await inside a catch clause, because SCIENCE!
+            }
+
+            if (file == null)
+            {
+                file = await folder.CreateFileAsync("scores.txt");
+                HighScores = new List<ScoreRecord>()
                 {
-                    string line;
-                    while ((line = reader.ReadLine()) != null)
+                    new ScoreRecord() { Name = "Dan", Time = "5:00" },
+                    new ScoreRecord() { Name = "Mike", Time = "7:00" },
+                    new ScoreRecord() { Name = "Chris", Time = "9:00" },
+                    new ScoreRecord() { Name = "Steve", Time = "11:00" },
+                    new ScoreRecord() { Name = "Rick", Time = "13:00" },
+                };
+                SaveHighScores();
+                HighScores.Clear();
+            }
+
+            using (var stream = await file.OpenSequentialReadAsync())
+            using (var reader = new StreamReader(stream.AsStreamForRead()))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(line))
                     {
-                        if (!string.IsNullOrWhiteSpace(line))
-                        {
-                            var split = line.Split(",".ToCharArray());
-                            var record = new ScoreRecord();
-                            record.Name = split[0];
-                            record.Time = split[1];
-                            HighScores.Add(record);
-                        }
+                        var split = line.Split(",".ToCharArray());
+                        var record = new ScoreRecord();
+                        record.Name = split[0];
+                        record.Time = split[1];
+                        HighScores.Add(record);
                     }
                 }
             }
@@ -192,8 +213,8 @@ namespace ui_assign_4
         {
             try
             {
-                var path = Package.Current.InstalledLocation.Path;
-                var file = await StorageFile.GetFileFromPathAsync(path + "\\scores.txt");
+                var folder = ApplicationData.Current.LocalFolder;
+                var file = await folder.GetFileAsync("scores.txt");
                 using (var stream = await file.OpenStreamForWriteAsync())
                 using (var writer = new StreamWriter(stream.AsOutputStream().AsStreamForWrite()))
                 {
@@ -206,7 +227,7 @@ namespace ui_assign_4
             catch (Exception ex)
             {
                 // Windows 8 has managed to implement a more complicated and obfuscated API
-                // which returns even more complicated and obfuscated exceptions.
+                // which throws even more complicated and obfuscated exceptions.
                 // Microsoft; because understanding where you went wrong isn't important.
             }
         }
