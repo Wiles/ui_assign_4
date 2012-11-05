@@ -26,6 +26,12 @@ namespace ui_assign_4
             TextColor = Windows.UI.Color.FromArgb(255, 0, 0, 0);
         }
 
+        public NumberBox(int row, int column): this()
+        {
+            this.Row = row;
+            this.Column = column;
+        }
+
         private Windows.UI.Color textColor { get; set;}
         public Windows.UI.Color TextColor
         {
@@ -40,7 +46,7 @@ namespace ui_assign_4
             }
         }
 
-        private int number { get; set; }
+        private int number =  0;
         public int Number
         {
             get
@@ -91,8 +97,15 @@ namespace ui_assign_4
         public bool Duplicate { get; set; }
 
         public event NumberBoxClicked Selected;
+        public int Row;
+        public int Column;
 
         private void Grid_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            HighlightSelection();
+        }
+
+        public void HighlightSelection()
         {
             if (Selected != null)
             {
@@ -105,5 +118,6 @@ namespace ui_assign_4
                 Selected(this, new EventArgs());
             }
         }
+
     }
 }

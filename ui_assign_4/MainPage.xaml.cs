@@ -7,7 +7,9 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
 using Windows.Storage.Streams;
+using Windows.System;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -26,20 +28,24 @@ namespace ui_assign_4
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private const int DefaultColumnCount = 9;
+
         public MainPage()
         {
             this.InitializeComponent();
+            CoreWindow.GetForCurrentThread().KeyDown += Window_KeyDown;
             GridValues = new NumberBox[81];
             ShowConflicts = true;
             HighScores = new List<ScoreRecord>();
 
             for (int i = 0; i < 81; i++)
             {
-                var a = new NumberBox();
+                var row = (int)i / DefaultColumnCount;
+                var column = i % DefaultColumnCount;
 
+                var a = new NumberBox(row, column);
                 mainGrid.Children.Add(a);
-                var row = (int)i / 9;
-                var column = i % 9;
+
                 Grid.SetRow(a, row + (int)row / 3);
                 Grid.SetColumn(a, column + (int)column / 3);
                 a.TextColor = Normal;
@@ -256,12 +262,12 @@ namespace ui_assign_4
             }
 
             // check vertical columns
-            for (int column = 0; column < 9; column++)
+            for (int column = 0; column < DefaultColumnCount; column++)
             {
                 var list = new List<NumberBox>();
-                for (int row = 0; row < 9; row++)
+                for (int row = 0; row < DefaultColumnCount; row++)
                 {
-                    var box = GridValues[((row * 9) + column)];
+                    var box = GridValues[((row * DefaultColumnCount) + column)];
 
                     if (box.Number != 0) list.Add(box);
                 }
@@ -270,12 +276,12 @@ namespace ui_assign_4
             }
 
             // check horizontal rows
-            for (int row = 0; row < 9; row++)
+            for (int row = 0; row < DefaultColumnCount; row++)
             {
                 var list = new List<NumberBox>();
-                for (int column = 0; column < 9; column++)
+                for (int column = 0; column < DefaultColumnCount; column++)
                 {
-                    var box = GridValues[((row * 9) + column)];
+                    var box = GridValues[((row * DefaultColumnCount) + column)];
 
                     if (box.Number != 0) list.Add(box);
                 }
@@ -413,6 +419,68 @@ namespace ui_assign_4
                 {
                     b.TextColor = b.Locked ? Locked : Normal;
                 }
+            }
+        }
+
+        private void Window_KeyDown(CoreWindow sender, KeyEventArgs args)
+        {
+            if (args.VirtualKey == VirtualKey.Delete)
+            {
+                Selected.Number = 0;
+            }
+            else if (args.VirtualKey == VirtualKey.Left)
+            {
+                if (Selected != null)
+                {
+                    SelectCell(Selected.Row, Selected.Column - 1);
+                }
+            }
+            else if (args.VirtualKey == VirtualKey.Right)
+            {
+                if (Selected != null)
+                {
+                    SelectCell(Selected.Row, Selected.Column + 1);
+                }
+            }
+            else if (args.VirtualKey == VirtualKey.Up)
+            {
+                if (Selected != null)
+                {
+                    SelectCell(Selected.Row - 1, Selected.Column);
+                }
+            }
+            else if (args.VirtualKey == VirtualKey.Down)
+            {
+                if (Selected != null)
+                {
+                    SelectCell(Selected.Row + 1, Selected.Column);
+                }
+            }
+            else
+            {
+                var number = VirtualKeyConversion.ConvertToInt(args.VirtualKey);
+                if (Selected != null && number >= 0 && number <= 9)
+                {
+                    var previous = Selected;
+                    numPad.TapKey(number);
+                    Selected = previous;
+                }
+            }
+        }
+
+        private void SelectCell(int row, int column)
+        {
+            int cellIndex = (row * DefaultColumnCount) + column;
+            if (cellIndex >= 0 && cellIndex < GridValues.Length)
+            {
+                var previous = Selected;
+                var next = GridValues[cellIndex];
+
+                previous.Number = previous.Number;
+
+                next.Number = next.Number;
+                next.HighlightSelection();
+                Selected = next;
             }
         }
     }

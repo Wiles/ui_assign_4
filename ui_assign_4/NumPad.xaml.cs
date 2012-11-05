@@ -55,5 +55,10 @@ namespace ui_assign_4
                 ButtonPressed(this, new NumberSelectedEventArgs() { Number = i });
             }
         }
+
+        public void TapKey(int number)
+        {
+            TriggerButton(number);
+        }
     }
 }
