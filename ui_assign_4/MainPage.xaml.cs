@@ -459,7 +459,7 @@ namespace ui_assign_4
             else
             {
                 var number = VirtualKeyConversion.ConvertToInt(args.VirtualKey);
-                if (Selected != null && number >= 0 && number <= 9)
+                if (Selected != null && number >= 0 && number <= 9 & !Selected.Locked)
                 {
                     var previous = Selected;
                     numPad.TapKey(number);
